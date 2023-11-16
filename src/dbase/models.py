@@ -4,17 +4,32 @@ from django.urls import reverse
 
 
 class UserAccountManager(BaseUserManager):
-    def create_user(self, phone, password):
+    def create_user(self, phone, name, password, super=False):
+        print(123123213)
         if not phone:
-            raise ValueError('Email must be set!')
-        user = self.model(phone=phone)
+            raise ValueError('Phone must be set!')
+        user = self.model(
+            phone=phone,
+            name=name
+        )
         user.set_password(password)
-        user.save(using=self._db)
+        if not super:
+            user.save(using=self._db)
         return user
 
-    def create_superuser(self, phone, password):
-        user = self.create_user(phone, password)
+    def create_superuser(self, phone, name, password):
+        print(123123213)
+        user = self.create_user(
+            phone,
+            name,
+            password=password,
+            super=True
+        )
+        print(123123213)
+        user.is_admin = True
         user.is_staff = True
+        user.is_superuser = True
+        print(123123123)
         user.save(using=self._db)
         return user
 
@@ -44,6 +59,8 @@ class Food(models.Model):
 
     id_restaurant = models.ManyToManyField(Restaurant)
 
+    objects = models.Manager()
+
     def get_absolute_url(self):
         return reverse('food', args=[self.id_food])
 
@@ -54,8 +71,11 @@ class Food(models.Model):
 class Company(models.Model):
     company_token = models.CharField(max_length=500, verbose_name='Токен для подключения сотрудников')
     title = models.CharField(max_length=120, verbose_name='Название компании', help_text='Введите название команды')
-    adresses = models.CharField(max_length=10000, verbose_name='Адреса компании', help_text='Введите все адреса вашей компании через запятую')
+    adresses = models.CharField(max_length=10000, verbose_name='Адреса компании', help_text='Введите все адреса вашей компании. Каждый адрес вводите на новой строке')
     balance = models.IntegerField(verbose_name='Баланс пользователя', help_text='Введите стоимость заказа пользователя')
+    image = models.ImageField(verbose_name='Изображение компании')
+
+    objects = models.Manager()
 
     def get_absolute_url(self):
         return reverse('company', args=[str(self.title)])
@@ -69,13 +89,15 @@ class Company(models.Model):
 
 class User(AbstractBaseUser):
     id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=120, verbose_name='Имя, фамилия пользователя пользователя', help_text='Ваше имя и фамилию', unique=True)
+    phone = models.CharField(max_length=120, verbose_name='Номер телефона', help_text='Введите ваш номер телефона', unique=True)
+    name = models.CharField(max_length=120, verbose_name='Имя', help_text='Ваше имя и фамилию', unique=True)
     company_token = models.CharField(max_length=500, verbose_name='Токен для подключения сотрудников')
     password = models.CharField(max_length=120, verbose_name='Пароль пользователя', help_text='Введите ваш пароль')
-    phone = models.CharField(max_length=120, verbose_name='Номер телефона', help_text='Введите ваш номер телефона', unique=True)
     address = models.CharField(max_length=120, verbose_name='Адрес', help_text='Введите ваш адрес')
-    is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
     objects = UserAccountManager()
     company = models.ManyToManyField(Company)
@@ -84,9 +106,9 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['password']
 
     class Meta:
-        verbose_name = 'Пользователь'
+        verbose_name = 'Пользователи'
         db_table = 'user'
-        ordering = ['phone']
+        ordering = ['id']
 
     def __str__(self):
         return self.phone
@@ -100,6 +122,12 @@ class User(AbstractBaseUser):
     def natural_key(self):
         return self.phone
 
+    def has_perm(self, perm, obj=None):
+        return self.is_admin
+
+    def has_module_perms(self, app_label):
+        return True
+
 
 class Orders(models.Model):
     #id_food = models.IntegerField(verbose_name='Id блюда')
@@ -108,8 +136,23 @@ class Orders(models.Model):
     id_food = models.ManyToManyField(Food)
     id_user = models.ManyToManyField(User)
 
+    objects = models.Manager()
+
     def get_absolute_url(self):
         return reverse('order', args=[self.id_user.name, self.id_food])
 
     def __str__(self):
         return self.id_user.name
+
+
+class Courier(models.Model):
+    number_phone = models.CharField(verbose_name='Номер телефона', max_length=12)
+    username_telegtam = models.CharField(verbose_name='Username курьера в Telegram', max_length=120)
+
+    object = models.Manager()
+
+    def get_absolute_url(self):
+        return reverse('courier', args=[self.username_telegtam])
+
+    def __str__(self):
+        return self.username_telegtam

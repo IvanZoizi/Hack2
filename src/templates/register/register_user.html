@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@200&display=swap" rel="stylesheet">
+<title>Обработка ошибок геолокации</title>
+<body>
+    <header class="header-main-page">
+        <h1 class="brend">Sea of friends {{  user.is_authenticated }}</h1>
+        {% if user.is_authenticated %}
+            <a class='reg' href="/profile/{">{{user.email}}</a>
+        {% else %}
+            <a class='reg' href="/login">Войти в аккаунт</a>
+        {% endif %}
+    </header>
+<main class="login_page">
+    <div  class="inp_form">
+        <form class="login_form" method="post">
+            {% csrf_token %}
+            <p>
+            {{ form.name.label }}<br>
+            {{ form.name }}<br>
+            {% for error in form.name.errors %}
+                <div>
+                    {{ error }}
+                </div>
+            {% endfor %}
+            </p>
+            <p>
+                {{ form.password.label }}<br>
+                {{ form.password }}<br>
+                {% for error in form.password.errors %}
+                    <div>
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </p>
+                <p>
+                {{ form.phone.label }}<br>
+                {{ form.phone }}<br>
+                {% for error in form.phone.errors %}
+                    <div>
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </p>
+            <button type="submit" >Зарегистрироваться</button>
+        </form>
+    </div>
+</main>
+
+</body>
+</html>

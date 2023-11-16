@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap" rel="stylesheet">
+
+</head>
+<body>
+
+    <div class="container">
+
+
+        <nav class="navbar">
+            <div class="menu">
+                <h3 class="logo">Company<span>name</span></h3>
+                <div class="burger">
+                    <div class="bar">
+
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+
+        <div class="screen" id="Home">
+            <div class="main">
+                <header class="header_one">
+                    <div class="header">
+                        <div class="header_item">
+                            <h2 class="title">GoodFood</h2>
+                            <p>GoodFood - это инновационная и уникальная платформа, созданная с целью улучшения взаимодействия
+                                 и организации корпоративного питания. Наша платформа представляет собой мощный инструмент, который
+                                  способствует эффективной связи и сотрудничеству между различными сторонами, участвующими
+                                   в процессе обеспечения сотрудников вкусным и питательным питанием.</p>
+                        </div>
+                    </div>
+                </header>
+            </div>
+
+            <div class="shadow one"></div>
+            <div class="shadow two"></div>
+
+        </div>
+
+
+
+        <div class="screen" id="Samsung">
+            <div class="main">
+                <header class="header_two">
+                    <div class="header">
+                        <div class="header_item">
+                            <h2 class="title">Обед на рабочем столе</h2>
+                            <p>Позвольте нам ввести в вашу рабочую жизнь изысканные и всегда свежие кулинарные шедевры,
+                                 прямо к вашему рабочему столу. Давайте создадим моменты истинного наслаждения в самых
+                                  занятых моментах вашего рабочего дня, где вкус и удовольствие встречаются с удобством
+                                  и доступностью. Вместе мы сделаем ваш обед не только вкусным, но и незабываемым.</p>
+                                {% if user.is_authenticated %}
+                                    <div>
+                                    <a class="btn" href="profile/user/{{user.id}}">Войти в Аккаунт {{user.name}}</a>
+                                    </div>
+                                    <div>
+                                    <a href="logout/" class="btn">Выйти из аккаунта</a>
+                                    </div>
+                                {% else %}
+                                    <button class="btn" id="client">Зарегистрироваться/Войти как клиент</button>
+                                {% endif %}
+                        </div>
+                    </div>
+                </header>
+            </div>
+
+            <div class="shadow one"></div>
+            <div class="shadow two"></div>
+
+        </div>
+
+
+        <div class="screen" id="Site">
+            <div class="main">
+                <header class="header_three">
+                    <div class="header">
+                        <div class="header_item">
+                            <h2 class="title">Выгодное сотрудничество</h2>
+                            <p>
+                                Оптимизируйте рабочий процесс и укрепите связь с вашими сотрудниками благодаря еде от наших поставщиков. Наше предложение позволит вам поддерживать контроль
+                                  над бюджетом, не уступая при этом в качестве блюд.
+                                  Давайте сделаем рабочий день вкусным и комфортным для вашей команды</p>
+                                <button class="btn" id="partner">Зарегистрироваться/Войти как партнер</button>
+                        </div>
+                    </div>
+                </header>
+            </div>
+
+            <div class="shadow one"></div>
+            <div class="shadow two"></div>
+
+        </div>
+
+
+        <div class="screen" id="Java">
+            <div class="main">
+                <header class="header_four">
+                    <div class="header">
+                        <div class="header_item">
+                            <h2 class="title">Партнерство и Развитие</h2>
+                            <p>Сотрудничество с нами обеспечивает эффективную презентацию ваших услуг и продуктов среди широкой аудитории.
+                                 У нас есть большая клиентская база, а также рейтинговая система для поддержки вашего бизнеса.
+                                  Мы также предлагаем удобную систему оценки блюд, чтобы вы могли понять спрос на ваши товары.</p>
+                                <button class="btn" id="provider">Зарегистрироваться/Войти как поставщик</button>
+                        </div>
+                    </div>
+                </header>
+            </div>
+
+            <div class="shadow one"></div>
+            <div class="shadow two"></div>
+
+        </div>
+
+        <div class="screen" id="Scratch">
+            <div class="main">
+                <header class="header_five">
+                    <div class="header">
+                        <div class="header_item">
+                            <h2 class="title">Добро пожаловать в нашу семью доставки!</h2>
+                            <p>Мы будем рады приветствовать вас в кругу наших профессионалов,
+                                 работающих на благо наших клиентов и обеспечивающих качественную доставку.
+                                  Ваше участие в нашей компании имеет ключевое значение для нашего и вашего успеха.
+                                   Мы верим в вашу способность сделать наших клиентов чуть более сытыми и счастливыми</p>
+                                <button class="btn" id="deliveryman">Зарегистрироваться/Войти как доставщик</button>
+                        </div>
+                    </div>
+                </header>
+            </div>
+
+            <div class="shadow one"></div>
+            <div class="shadow two"></div>
+
+        </div>
+
+
+        <div class="screen" id="Projects">
+            <div class="main">
+                <header class="header_six">
+                    <div class="header">
+                        <div class="header_item">
+                            <h2 class="title">О нас</h2>
+                            <p>Мы - небольшая, но эффективная команда, занимающаяся усовершенствованием коммуникации
+                                 между компаниями, поставщиками и клиентами. Наше приложение разработано тремя
+                                  людьми с большим опытом в этой области. Мы верим в простоту и удобство,
+                                   поэтому работаем, чтобы упростить бизнес-коммуникации.</p>
+                        </div>
+                    </div>
+                </header>
+            </div>
+
+            <div class="shadow one"></div>
+            <div class="shadow two"></div>
+
+        </div>
+
+        <div class="links">
+            <ul>
+                <li>
+                    <a href="#" class="link" data-link="Home" style="--i: 0.1s">Главная</a>
+                </li>
+
+                <li>
+                    <a href="#" class="link"  data-link="Samsung" style="--i: 0.15s">Клиенту</a>
+                </li>
+
+                <li>
+                    <a href="#" class="link"  data-link="Site" style="--i: 0.2s">Компаниям партнерам</a>
+                </li>
+
+                <li>
+                    <a href="#" class="link"  data-link="Java" style="--i: 0.25s">Поставщикам</a>
+                </li>
+
+                <li>
+                    <a href="#" class="link"  data-link="Scratch" style="--i: 0.35s">Работнику</a>
+                </li>
+
+                <li>
+                    <a href="#" class="link"  data-link="Projects" style="--i: 0.3s">О нас</a>
+                </li>
+
+
+            </ul>
+        </div>
+    </div>
+    
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>
