@@ -25,7 +25,7 @@ class RegisterUser(forms.Form):
 
 class LoginUser(forms.Form):
     phone = forms.RegexField(regex=r'^\+?1?\d{9,15}$', help_text='Введите номер телефона')
-    password = forms.CharField(max_length=10000, help_text='Придумайте пароль')
+    password = forms.CharField(max_length=10000, help_text='Введите пароль')
 
     class Meta:
         model = models.User
