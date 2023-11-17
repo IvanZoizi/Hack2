@@ -61,12 +61,8 @@
                                   занятых моментах вашего рабочего дня, где вкус и удовольствие встречаются с удобством
                                   и доступностью. Вместе мы сделаем ваш обед не только вкусным, но и незабываемым.</p>
                                 {% if user.is_authenticated %}
-                                    <div>
                                     <a class="btn" href="profile/user/{{user.id}}">Войти в Аккаунт {{user.name}}</a>
-                                    </div>
-                                    <div>
                                     <a href="logout/" class="btn">Выйти из аккаунта</a>
-                                    </div>
                                 {% else %}
                                     <button class="btn" id="client">Зарегистрироваться/Войти как клиент</button>
                                 {% endif %}

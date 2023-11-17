@@ -38,9 +38,6 @@ def sign_in(request):
             password = form.cleaned_data['password']
             print(phone, password)
             user = User.objects.get(phone=phone)
-            print(user)
-            a = user.check_password(password)
-            print(a)
             if user.check_password(password):
                 login(request, user)
                 return redirect('main_page')
