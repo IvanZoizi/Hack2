@@ -12,9 +12,7 @@
     <header class="header-main-page">
         <h1 class="brend">Sea of friends {{  user.is_authenticated }}</h1>
         {% if user.is_authenticated %}
-            <a class='reg' href="/profile/{">{{user.email}}</a>
-        {% else %}
-            <a class='reg' href="/login">Войти в аккаунт</a>
+            <a class='reg' href="/profile/user/{{user.id}}">Войти в Аккаунт {{user.name}}</a>
         {% endif %}
     </header>
 <main class="login_page">
@@ -48,14 +46,7 @@
                     </div>
                 {% endfor %}
             </p>
-                <p>
-                {{ form.image.label }}<br>
-                {{ form.image }}<br>
-                {% for error in form.image.errors %}
-                    <div>
-                        {{ error }}
-                    </div>
-                {% endfor %}
+                {{error}}
             </p>
             <button type="submit" >Зарегистрироваться</button>
         </form>

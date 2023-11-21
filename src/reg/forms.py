@@ -8,6 +8,7 @@ class RegisterCompany(forms.Form):
     adresses = forms.CharField(max_length=10000, help_text='Введите все адреса вашей компании. Каждый адрес вводите на новой строке')
     balance = forms.IntegerField(help_text='Введите стоимость заказа пользователя')
 
+
     class Meta:
         model = models.Company
         fields = ['title', 'address', 'balance', 'image']

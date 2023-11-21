@@ -10,6 +10,7 @@ from dbase.models import Company, User
 from uuid import uuid4
 
 
+
 class Register(DataMixin, FormView):
     template_name = 'register/register_company.html'  # добавить файл
     form_class = RegisterCompany
@@ -93,19 +94,25 @@ def logout_user(request):
     return redirect('main_page')
 
 
-"""def registration_user(request):
-    if request.method == 'POST':
-        form = SignUpForm(request.POST)
+def register_company(request):
+    user = request.user
+    if request.method == 'GET':
+        if user.is_authenticated:
+            form = RegisterCompany()
+            return render(request, 'register/register_company.html', {'form': form})
+        else:
+            return redirect('/login')
+    elif request.method == 'POST':
+        form = RegisterCompany(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save()
-            User.objects.create(user=user, phone_number=form.cleaned_data.get('phone_number'))
-            raw_password = form.cleaned_data.get('password1')
-            user = authenticate(username=user.username, password=raw_password)
-            login(request, user)
-            # высылаем письмо и делаем его неактивным
-            user.is_active = False
-            send_email(user)
-            return redirect('/')
-    else:
-        form = re()
-    return render(request, 'signup.html', {'form': form})"""
+            data = form.cleaned_data
+            user_company = Company.objects.filter(user_id=user.id)
+            print(user_company)
+            if user_company:
+                form = RegisterCompany()
+                return render(request, 'register/register_company.html',
+                              {'form': form, 'error': 'У вас уже есть компания'})
+            company = Company.objects.create(title=data['title'], balance=data['balance'], adresses=data['adresses'], company_token=uuid4(),
+                                             user_id=user.id)
+            company.save()
+            return redirect('profile/company/' + str(company.id))
