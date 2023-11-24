@@ -43,11 +43,12 @@ class Food(models.Model):
     def thumbnail_preview(self):
         if self.photo:
             _thumbnail = get_thumbnail(self.photo,
-                                   '300x300',
-                                   upscale=False,
-                                   crop=False,
-                                   quality=100)
-            return format_html('<img src="{}" width="{}" height="{}">'.format(_thumbnail.url, _thumbnail.width, _thumbnail.height))
+                                       '300x300',
+                                       upscale=False,
+                                       crop=False,
+                                       quality=100)
+            return format_html(
+                '<img src="{}" width="{}" height="{}">'.format(_thumbnail.url, _thumbnail.width, _thumbnail.height))
         return ""
 
     title = models.CharField(max_length=120, verbose_name='Название блюда', help_text='Введите название блюда')
@@ -56,7 +57,7 @@ class Food(models.Model):
     protein = models.FloatField(verbose_name='Белок', help_text='Укажите сколько содержится белков в блюде в граммах')
     fats = models.FloatField(verbose_name='Жиры', help_text='Укажите сколько содержится жиров в блюде в граммах')
     carbohydrates = models.FloatField(verbose_name='Углеводы',
-                                        help_text='Укажите сколько содержится углеводов в блюде')
+                                      help_text='Укажите сколько содержится углеводов в блюде')
 
     objects = models.Manager()
 
@@ -74,7 +75,8 @@ class Food(models.Model):
 class Company(models.Model):
     company_token = models.CharField(max_length=500, verbose_name='Токен для подключения сотрудников')
     title = models.CharField(max_length=120, verbose_name='Название компании', help_text='Введите название команды')
-    adresses = models.CharField(max_length=10000, verbose_name='Адреса компании', help_text='Введите все адреса вашей компании. Каждый адрес вводите на новой строке')
+    adresses = models.CharField(max_length=10000, verbose_name='Адреса компании',
+                                help_text='Введите все адреса вашей компании. Каждый адрес вводите на новой строке')
     balance = models.IntegerField(verbose_name='Баланс пользователя', help_text='Введите стоимость заказа пользователя')
     user_id = models.IntegerField()
 
@@ -92,7 +94,8 @@ class Company(models.Model):
 
 class User(AbstractBaseUser):
     id = models.IntegerField(primary_key=True)
-    phone = models.CharField(max_length=120, verbose_name='Номер телефона', help_text='Введите ваш номер телефона', unique=True)
+    phone = models.CharField(max_length=120, verbose_name='Номер телефона', help_text='Введите ваш номер телефона',
+                             unique=True)
     name = models.CharField(max_length=120, verbose_name='Имя', help_text='Ваше имя и фамилию')
     company_token = models.CharField(max_length=500, verbose_name='Токен для подключения сотрудников')
     password = models.CharField(max_length=120, verbose_name='Пароль пользователя', help_text='Введите ваш пароль')
@@ -133,7 +136,7 @@ class User(AbstractBaseUser):
 
 
 class Orders(models.Model):
-    #id_food = models.IntegerField(verbose_name='Id блюда')
+    # id_food = models.IntegerField(verbose_name='Id блюда')
     quantity = models.IntegerField(verbose_name='Кол-во порций')
     comment = models.CharField(max_length=300, verbose_name='Комментарий пользователя')
     id_food = models.ManyToManyField(Food)
@@ -163,3 +166,28 @@ class Courier(models.Model):
 
     def __str__(self):
         return self.username_telegtam
+
+    class Meta:
+        verbose_name = 'Курьеры'
+        verbose_name_plural = 'Курьеры'
+
+
+class Expectation_Courier(models.Model):
+    username_telegtam = models.CharField(verbose_name='Username курьера в Telegram', max_length=120)
+    name = models.CharField(verbose_name='Ваше имя', max_length=120)
+    number_phone = models.CharField(verbose_name='Номер телефона', max_length=12)
+    type_amusement = models.CharField(verbose_name='Тип занятности', max_length=120)
+    avto = models.CharField(verbose_name='Вы будете передвигаться пешком? ', max_length=50)
+    description = models.CharField(verbose_name='Расскажите о себе', max_length=300)
+
+    object = models.Manager()
+
+    def get_absolute_url(self):
+        return reverse('courier', args=[self.username_telegtam])
+
+    def __str__(self):
+        return self.username_telegtam
+
+    class Meta:
+        verbose_name = 'Заявки для работы на должность "Курьер"'
+        verbose_name_plural = 'Заявки для работы на должность "Курьер"'
