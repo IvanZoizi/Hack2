@@ -9,11 +9,6 @@ class RegisterCompany(forms.Form):
     balance = forms.IntegerField(help_text='Введите стоимость заказа пользователя')
 
 
-    class Meta:
-        model = models.Company
-        fields = ['title', 'address', 'balance', 'image']
-
-
 class RegisterUser(forms.Form):
     name = forms.CharField(max_length=120, help_text='Введите ваше имя')
     password = forms.CharField(max_length=10000, help_text='Придумайте пароль')

@@ -18,13 +18,12 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from main.views import main_view
-from reg.views import Register, RegisterView, sign_in, logout_user, register_company
+from reg.views import RegisterView, sign_in, logout_user
 from src import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', main_view, name='main_page'),
-    path('register/company/', register_company, name='reg-company'),
     path('register/user/', RegisterView.as_view(), name='reg-user'),
     path('login/', sign_in, name='login'),
     path('logout/', logout_user),

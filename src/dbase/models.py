@@ -53,6 +53,7 @@ class Food(models.Model):
 
     title = models.CharField(max_length=120, verbose_name='Название блюда', help_text='Введите название блюда')
     price = models.IntegerField(verbose_name='Цена за блюдо', help_text='Введите цену за блюдо')
+    count = models.IntegerField(verbose_name='Кол-во порций на следующий день', help_text='Введите какое кол-во порций будет приготовлено', default=0)
     structure = models.CharField(max_length=1000, verbose_name='Состав', help_text='Напишите из чего состоит блюдо')
     protein = models.FloatField(verbose_name='Белок', help_text='Укажите сколько содержится белков в блюде в граммах')
     fats = models.FloatField(verbose_name='Жиры', help_text='Укажите сколько содержится жиров в блюде в граммах')
@@ -72,32 +73,11 @@ class Food(models.Model):
         return self.title
 
 
-class Company(models.Model):
-    company_token = models.CharField(max_length=500, verbose_name='Токен для подключения сотрудников')
-    title = models.CharField(max_length=120, verbose_name='Название компании', help_text='Введите название команды')
-    adresses = models.CharField(max_length=10000, verbose_name='Адреса компании',
-                                help_text='Введите все адреса вашей компании. Каждый адрес вводите на новой строке')
-    balance = models.IntegerField(verbose_name='Баланс пользователя', help_text='Введите стоимость заказа пользователя')
-    user_id = models.IntegerField()
-
-    objects = models.Manager()
-
-    def get_absolute_url(self):
-        return reverse('company', args=[str(self.title)])
-
-    def get_token(self):
-        return self.company_token
-
-    def __str__(self):
-        return self.title
-
-
 class User(AbstractBaseUser):
     id = models.IntegerField(primary_key=True)
     phone = models.CharField(max_length=120, verbose_name='Номер телефона', help_text='Введите ваш номер телефона',
                              unique=True)
     name = models.CharField(max_length=120, verbose_name='Имя', help_text='Ваше имя и фамилию')
-    company_token = models.CharField(max_length=500, verbose_name='Токен для подключения сотрудников')
     password = models.CharField(max_length=120, verbose_name='Пароль пользователя', help_text='Введите ваш пароль')
     address = models.CharField(max_length=120, verbose_name='Адрес', help_text='Введите ваш адрес')
     is_staff = models.BooleanField(default=False)
@@ -135,24 +115,29 @@ class User(AbstractBaseUser):
         return True
 
 
-class Orders(models.Model):
-    # id_food = models.IntegerField(verbose_name='Id блюда')
-    quantity = models.IntegerField(verbose_name='Кол-во порций')
-    comment = models.CharField(max_length=300, verbose_name='Комментарий пользователя')
-    id_food = models.ManyToManyField(Food)
-    id_user = models.ManyToManyField(User)
-
-    objects = models.Manager()
+class Statistics(models.Model):
+    food_name = models.CharField(verbose_name='Название блюда', max_length=120)
+    count = models.IntegerField(verbose_name='Сколько порций было куплено')
+    price = models.IntegerField(verbose_name='Прибыль без учета себестоимости')
+    day_of_the_week = models.CharField(verbose_name='День недели', max_length=120)
+    date = models.CharField(verbose_name='Дата', max_length=120)
 
     class Meta:
-        verbose_name = 'Заказы'
-        verbose_name_plural = 'Заказы'
+        verbose_name = 'Статистика'
+        verbose_name_plural = 'Статистика'
 
-    def get_absolute_url(self):
-        return reverse('order', args=[self.id_user.name, self.id_food])
 
-    def __str__(self):
-        return self.id_user.name
+class NewOrders(models.Model):
+    id_order = models.IntegerField(verbose_name='Номер заказа')
+    # id_food = models.IntegerField(verbose_name='Id блюда')
+    user_name = models.CharField(verbose_name='Имя пользователя', max_length=120)
+    user_phone = models.CharField(verbose_name='Номер телефона пользователя', max_length=120)
+    price = models.IntegerField(verbose_name='Цена заказа')
+    foods = models.CharField(verbose_name='Название блюд', max_length=12000)
+
+    class Meta:
+        verbose_name = 'Новые заказы'
+        verbose_name_plural = 'Новые заказы'
 
 
 class Courier(models.Model):
@@ -191,3 +176,14 @@ class Expectation_Courier(models.Model):
     class Meta:
         verbose_name = 'Заявки для работы на должность "Курьер"'
         verbose_name_plural = 'Заявки для работы на должность "Курьер"'
+
+
+class DeliveryOrders(models.Model):
+    id_order = models.IntegerField(verbose_name='Id заказа')
+    courier_username = models.CharField(max_length=120, verbose_name='Username курьера в Telegram')
+    courier_phone = models.CharField(verbose_name='Номер телефона', max_length=12)
+
+    class Meta:
+        verbose_name = 'Заказы, которые доставит курьер'
+        verbose_name_plural = 'Заказы, которые доставит курьер'
+
