@@ -1,30 +1,42 @@
 from django.contrib import admin
+from django.utils.html import format_html
 
 from .models import User, Food, Expectation_Courier, Courier, Statistics, NewOrders, DeliveryOrders
 from django import forms
 from django.contrib.auth.models import Group
+from django.contrib.admin.models import LogEntry
 
 
 class FoodModelForm(forms.ModelForm):
     structure = forms.CharField(widget=forms.Textarea, label='Состав блюда', help_text='Напишите из чего состоит блюдо')
+    CHOICES = (
+        ('1', 'Первое блюдо'),
+        ('2', 'Второе блюдо'),
+        ('3', 'Салаты'),
+        ('4', 'Десерты'),
+        ('5', 'Напиток'),
+
+    )
+    type_food = forms.ChoiceField(choices=CHOICES)
 
     class Meta:
         model = Food
-        fields = ['title', 'photo', 'price', 'structure', 'protein', 'fats', 'carbohydrates']
+        fields = ['title', 'photo', 'price', 'structure', 'type_food', 'protein', 'fats', 'carbohydrates']
 
 
 @admin.register(Food)
 class FoodAdmin(admin.ModelAdmin):
-    list_display = ("title", "price", 'count', 'protein', 'fats', 'carbohydrates')
     search_fields = ('title',)
-    fields = ['title', 'photo', 'price', 'count', 'structure', 'protein', 'fats', 'carbohydrates']
-    #readonly_fields = ('photo',)
+    fields = ['title', 'photo', 'price', 'count', 'structure', 'type_food', 'protein', 'fats', 'carbohydrates']
+    ordering = ['type_food']
 
-    def thumbnail_preview(self, obj):
-        return obj.thumbnail_preview
+    def change_button(self, obj):
+        return format_html('<a class="btn" href="/admin/dbase/food/{}/change/">Изменить</a>', obj.id_food)
 
-    thumbnail_preview.short_description = 'Photo Preview'
-    thumbnail_preview.allow_tags = True
+    def delete_button(self, obj):
+        return format_html('<a class="btn" href="/admin/dbase/food/{}/delete/">Удалить</a>', obj.id_food)
+
+    list_display = ("title", 'type_food', "price", 'count', 'protein', 'fats', 'carbohydrates', 'change_button', 'delete_button')
 
     form = FoodModelForm
 
@@ -37,8 +49,8 @@ class Expectation_CourierAdmin(admin.ModelAdmin):
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('name', 'phone', 'is_staff', 'is_admin')
-    fields = ['name', 'phone', 'is_staff', 'is_admin']
+    list_display = ('name', 'phone', 'is_admin')
+    fields = ['name', 'phone', 'is_admin']
 
 
 @admin.register(Courier)
@@ -63,3 +75,4 @@ class DeliveryOrdersAdmin(admin.ModelAdmin):
 
 
 admin.site.unregister(Group)
+LogEntry.objects.all().delete()

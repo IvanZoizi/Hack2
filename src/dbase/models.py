@@ -1,43 +1,37 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, UserManager
 from django.urls import reverse
 from django.utils.html import format_html
 from sorl.thumbnail import get_thumbnail
 
 
-class UserAccountManager(BaseUserManager):
-    def create_user(self, phone, name, password, super=False):
-        if not phone:
-            raise ValueError('Phone must be set!')
+class UserAccountManager(UserManager):
+    def create_user(self, phone, name=None, password=None, **extra_fields):
+        if not phone or not name or not password:
+            return ValueError("Нету аргумента")
         user = self.model(
             phone=phone,
             name=name
         )
         user.set_password(password)
-        if not super:
-            user.save(using=self._db)
+        user.save(using=self._db)
         return user
 
-    def create_superuser(self, phone, name, password):
-        user = self.create_user(
-            phone,
-            name,
-            password=password,
-            super=True
-        )
+    def create_superuser(self, phone, name=None, password=None, **extra_fields):
+        if not phone or not name:
+            return ValueError('Не переданы аргументы')
+        user = self.create_user(phone, name, password)
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
         return user
 
-    def get_by_natural_key(self, email_):
-        return self.get()
 
 
 class Food(models.Model):
     id_food = models.IntegerField(primary_key=True)
-    photo = models.ImageField(verbose_name='Фотография блюда', upload_to='post/photo/%Y/%m/%d/', null=True, blank=True)
+    photo = models.ImageField(verbose_name='Фотография блюда', upload_to='post', null=True, blank=True)
 
     @property
     def thumbnail_preview(self):
@@ -59,8 +53,8 @@ class Food(models.Model):
     fats = models.FloatField(verbose_name='Жиры', help_text='Укажите сколько содержится жиров в блюде в граммах')
     carbohydrates = models.FloatField(verbose_name='Углеводы',
                                       help_text='Укажите сколько содержится углеводов в блюде')
-
-    objects = models.Manager()
+    type_food = models.CharField(verbose_name='Вид блюда', max_length=120, help_text='Укажите вид блюда')
+    objects = UserAccountManager()
 
     class Meta:
         verbose_name = 'Меню'
@@ -80,10 +74,10 @@ class User(AbstractBaseUser):
     name = models.CharField(max_length=120, verbose_name='Имя', help_text='Ваше имя и фамилию')
     password = models.CharField(max_length=120, verbose_name='Пароль пользователя', help_text='Введите ваш пароль')
     address = models.CharField(max_length=120, verbose_name='Адрес', help_text='Введите ваш адрес')
-    is_staff = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=True, verbose_name='Пользователь является ')
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False, verbose_name='Пользователь является админом')
 
     objects = UserAccountManager()
 

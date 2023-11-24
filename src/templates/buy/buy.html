@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% for elem in elems %}
+            <img src="{{ elem.photo.url }}">
+            <p>{{elem.title}}</p>
+            <p>Цена - {{elem.price}}</p>
+            <p>Осталось порций - {{elem.count}}</p>
+            <a href="buy/2/{{elem.id_food}}"></a>
+    {% endfor %}
+
+</body>
+</html>
