@@ -10,11 +10,11 @@ from django.contrib.admin.models import LogEntry
 class FoodModelForm(forms.ModelForm):
     structure = forms.CharField(widget=forms.Textarea, label='Состав блюда', help_text='Напишите из чего состоит блюдо')
     CHOICES = (
-        ('1', 'Первое блюдо'),
-        ('2', 'Второе блюдо'),
-        ('3', 'Салаты'),
-        ('4', 'Десерты'),
-        ('5', 'Напиток'),
+        ('Первое блюдо', 'Первое блюдо'),
+        ('Второе блюдо', 'Второе блюдо'),
+        ('Салаты', 'Салаты'),
+        ('Десерты', 'Десерты'),
+        ('Напиток', 'Напиток'),
 
     )
     type_food = forms.ChoiceField(choices=CHOICES)

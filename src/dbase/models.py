@@ -47,7 +47,7 @@ class Food(models.Model):
 
     title = models.CharField(max_length=120, verbose_name='Название блюда', help_text='Введите название блюда')
     price = models.IntegerField(verbose_name='Цена за блюдо', help_text='Введите цену за блюдо')
-    count = models.IntegerField(verbose_name='Кол-во порций на следующий день', help_text='Введите какое кол-во порций будет приготовлено', default=0)
+    count = models.IntegerField(verbose_name='Кол-во порций', help_text='Введите какое кол-во порций будет приготовлено', default=0)
     structure = models.CharField(max_length=1000, verbose_name='Состав', help_text='Напишите из чего состоит блюдо')
     protein = models.FloatField(verbose_name='Белок', help_text='Укажите сколько содержится белков в блюде в граммах')
     fats = models.FloatField(verbose_name='Жиры', help_text='Укажите сколько содержится жиров в блюде в граммах')
@@ -180,3 +180,9 @@ class DeliveryOrders(models.Model):
         verbose_name = 'Заказы, которые доставит курьер'
         verbose_name_plural = 'Заказы, которые доставит курьер'
 
+
+class Basket(models.Model):
+    id_user = models.IntegerField()
+    id_food = models.CharField(max_length=123213)
+
+    object = models.Manager()
