@@ -116,6 +116,8 @@ class Statistics(models.Model):
     day_of_the_week = models.CharField(verbose_name='День недели', max_length=120)
     date = models.CharField(verbose_name='Дата', max_length=120)
 
+    object = models.Manager()
+
     class Meta:
         verbose_name = 'Статистика'
         verbose_name_plural = 'Статистика'
@@ -129,6 +131,8 @@ class NewOrders(models.Model):
     price = models.IntegerField(verbose_name='Цена заказа')
     foods = models.CharField(verbose_name='Название блюд', max_length=12000)
     delivery = models.BooleanField(verbose_name='Доставляется ли заказ?')
+
+    object = models.Manager()
 
     class Meta:
         verbose_name = 'Новые заказы'

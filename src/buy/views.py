@@ -1,6 +1,8 @@
-from django.shortcuts import render
-from dbase.models import Food, Basket
-from forms import Delivery
+import datetime
+
+from django.shortcuts import render, redirect
+from dbase.models import Food, Basket, Statistics, NewOrders
+from .forms import Delivery
 
 
 def buy_first_dish(request):
@@ -15,9 +17,12 @@ def buy_first_dish(request):
 
 def buy_second_dish(request, pk):
     user = request.user
-    basket = Basket.object.get(id_user=user.id)
-    if basket:
-        basket.delete()
+    try:
+        basket = Basket.object.get(id_user=user.id)
+        if basket:
+            basket.delete()
+    except Exception as ex:
+        pass
     order = Basket(id_user=user.id)
     if pk != 0:
         first_food = Food.objects.get(id_food=pk)
@@ -100,17 +105,46 @@ def confirm(request, pk):
         result = 0
         check_list = []
         for elem in order.id_food.split(','):
-            if elem != '0':
+            print(elem)
+            if elem != '0' and elem != '':
                 food = Food.objects.get(id_food=int(elem))
-                food.count -= 1
                 result += food.price
                 check_list.append(food.title)
         if result == 0:
             return render(request, 'buy/confirm.html', {'error': 'Вы не выбрали ни одного блюда'})
         else:
-            return render(request, 'buy/confirm.html', {'price': result, 'check_list': check_list, 'form': form})
+            return render(request, 'buy/confirm.html', {'price': result, 'check_list': ','.join(check_list), 'form': form})
     elif request.method == 'POST':
         form = Delivery(request.POST)
         if form.is_valid():
+            result = 0
+            check_list = []
             data = form.cleaned_data
-            print(data)
+            user = request.user
+            basket = Basket.object.get(id_user=user.id)
+            for elem in basket.id_food.split(','):
+                if elem != '0' and elem != '':
+                    food = Food.objects.get(id_food=int(elem))
+                    food.count -= 1
+                    food.save()
+                    result += food.price
+                    check_list.append(food.title)
+                    try:
+                        static = Statistics.object.get(food_name=food.title, day_of_the_week=datetime.datetime.now().strftime('%A'),
+                                                       date=datetime.datetime.now().strftime("%d.%m.%Y"))
+                        static.count += 1
+                        static.price += food.price
+                    except Exception:
+                        static = Statistics(food_name=food.title, day_of_the_week=datetime.datetime.now().strftime('%A'),
+                                                       date=datetime.datetime.now().strftime("%d.%m.%Y"))
+                        static.count = 1
+                        static.price = food.price
+                    static.save()
+            new_order = NewOrders(user_name=user.name, user_phone=user.phone, price=result, foods=','.join(check_list),
+                                  delivery=data['check'])
+            new_order.save()
+            return redirect('/success')
+
+
+def success(requests):
+    return render(requests, 'buy/success.html')

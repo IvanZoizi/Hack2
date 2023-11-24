@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+  {% if error %}
+      <p>{{error}}</p>
+      <a>Попробуйте снова</a>
+  {% else %}
+      <p>Вы заказали на сумму - {{price}}</p>
+      <p>Ваш заказ - {{check_list}}
+      <form method="POST" novalidate>
+          {% csrf_token %}
+          {{form.as_p}}
+          <input type="submit" value="Заказать"/>
+          <p>Оплата будет производиться наличным у курьера либо же на месте получения еды</p>
+      </form>
+  {% endif %}
+</body>
+</html>
