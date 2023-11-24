@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from dbase.models import Food, Basket
+from forms import Delivery
 
 
 def buy_first_dish(request):
@@ -87,6 +88,7 @@ def buy_fives_dish(request, pk):
 
 def confirm(request, pk):
     if request.method == 'GET':
+        form = Delivery()
         user = request.user
         order = Basket.object.get(id_user=user.id)
         if pk != 0:
@@ -106,4 +108,9 @@ def confirm(request, pk):
         if result == 0:
             return render(request, 'buy/confirm.html', {'error': 'Вы не выбрали ни одного блюда'})
         else:
-            return render(request, 'buy/confirm.html', {'price': result, 'check_list': check_list})
+            return render(request, 'buy/confirm.html', {'price': result, 'check_list': check_list, 'form': form})
+    elif request.method == 'POST':
+        form = Delivery(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            print(data)

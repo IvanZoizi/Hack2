@@ -128,6 +128,7 @@ class NewOrders(models.Model):
     user_phone = models.CharField(verbose_name='Номер телефона пользователя', max_length=120)
     price = models.IntegerField(verbose_name='Цена заказа')
     foods = models.CharField(verbose_name='Название блюд', max_length=12000)
+    delivery = models.BooleanField(verbose_name='Доставляется ли заказ?')
 
     class Meta:
         verbose_name = 'Новые заказы'
