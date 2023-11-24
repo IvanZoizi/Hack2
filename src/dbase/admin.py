@@ -44,7 +44,7 @@ class FoodAdmin(admin.ModelAdmin):
 @admin.register(Expectation_Courier)
 class Expectation_CourierAdmin(admin.ModelAdmin):
     list_display = ("username_telegtam", "name")
-    readonly_fields = ('username_telegtam', 'name', 'number_phone', 'type_amusement', 'avto', 'description')
+    readonly_fields = ('username_telegtam', 'name', 'number_phone', 'type_amusement', 'description')
 
 
 @admin.register(User)

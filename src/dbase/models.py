@@ -156,8 +156,7 @@ class Expectation_Courier(models.Model):
     name = models.CharField(verbose_name='Ваше имя', max_length=120)
     number_phone = models.CharField(verbose_name='Номер телефона', max_length=12)
     type_amusement = models.CharField(verbose_name='Тип занятности', max_length=120)
-    avto = models.CharField(verbose_name='Вы будете передвигаться пешком? ', max_length=50)
-    description = models.CharField(verbose_name='Расскажите о себе', max_length=300)
+    description = models.CharField(verbose_name='Расскажите о себе', max_length=3000000)
 
     object = models.Manager()
 

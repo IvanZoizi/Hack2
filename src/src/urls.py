@@ -20,6 +20,7 @@ from django.urls import path, include
 from main.views import main_view
 from reg.views import RegisterView, sign_in, logout_user
 from src import settings
+from buy.views import buy_first_dish
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +28,6 @@ urlpatterns = [
     path('register/user/', RegisterView.as_view(), name='reg-user'),
     path('login/', sign_in, name='login'),
     path('logout/', logout_user),
+    path('buy/1', buy_first_dish)
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
