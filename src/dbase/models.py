@@ -128,6 +128,7 @@ class NewOrders(models.Model):
 class Courier(models.Model):
     number_phone = models.CharField(verbose_name='Номер телефона', max_length=12)
     username_telegtam = models.CharField(verbose_name='Username курьера в Telegram', max_length=120)
+    id_user = models.IntegerField(verbose_name='ID в Telegram')
 
     object = models.Manager()
 
@@ -143,6 +144,7 @@ class Courier(models.Model):
 
 
 class Expectation_Courier(models.Model):
+    id_user = models.IntegerField(verbose_name='ID в Telegram')
     username_telegtam = models.CharField(verbose_name='Username курьера в Telegram', max_length=120)
     name = models.CharField(verbose_name='Ваше имя', max_length=120)
     number_phone = models.CharField(verbose_name='Номер телефона', max_length=12)
