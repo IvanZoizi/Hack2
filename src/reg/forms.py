@@ -1,6 +1,5 @@
 from django import forms
 from dbase import models
-from phonenumber_field.modelfields import PhoneNumberField
 
 
 class RegisterCompany(forms.Form):

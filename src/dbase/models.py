@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, UserManager
 from django.urls import reverse
 from django.utils.html import format_html
-from sorl.thumbnail import get_thumbnail
 
 
 class UserAccountManager(UserManager):
@@ -32,19 +31,6 @@ class UserAccountManager(UserManager):
 class Food(models.Model):
     id_food = models.IntegerField(primary_key=True)
     photo = models.ImageField(verbose_name='Фотография блюда', upload_to='post', null=True, blank=True)
-
-    @property
-    def thumbnail_preview(self):
-        if self.photo:
-            _thumbnail = get_thumbnail(self.photo,
-                                       '300x300',
-                                       upscale=False,
-                                       crop=False,
-                                       quality=100)
-            return format_html(
-                '<img src="{}" width="{}" height="{}">'.format(_thumbnail.url, _thumbnail.width, _thumbnail.height))
-        return ""
-
     title = models.CharField(max_length=120, verbose_name='Название блюда', help_text='Введите название блюда')
     price = models.IntegerField(verbose_name='Цена за блюдо', help_text='Введите цену за блюдо')
     count = models.IntegerField(verbose_name='Кол-во порций', help_text='Введите какое кол-во порций будет приготовлено', default=0)

@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     'dbase',
     'main',
     'reg',
-    'sorl.thumbnail',
 ]
 
 MIDDLEWARE = [

@@ -65,18 +65,14 @@ document.getElementById("client").onclick = function () {
     window.location.href = "/register/user";
   };
 
-document.getElementById("not").onclick = function () {
-  };
-
-
 document.getElementById("partner").onclick = function () {
     // Здесь вы можете указать ссылку на вторую HTML страницу
-    window.location.href = "../the_supplier/index.html";
+    window.location.href = "/buy/1/";
   };
 
 document.getElementById("provider").onclick = function () {
     // Здесь вы можете указать ссылку на вторую HTML страницу
-    window.location.href = "../the_supplier/index.html";
+    window.location.href = "/buy/1/";
   };
 
 document.getElementById("deliveryman").onclick = function () {
