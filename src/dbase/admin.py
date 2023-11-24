@@ -75,4 +75,3 @@ class DeliveryOrdersAdmin(admin.ModelAdmin):
 
 
 admin.site.unregister(Group)
-LogEntry.objects.all().delete()

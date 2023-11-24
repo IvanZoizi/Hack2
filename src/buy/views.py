@@ -141,7 +141,7 @@ def confirm(request, pk):
                         static.price = food.price
                     static.save()
             new_order = NewOrders(user_name=user.name, user_phone=user.phone, price=result, foods=','.join(check_list),
-                                  delivery=data['check'])
+                                  delivery='Да' if data['check'] else 'Нет')
             new_order.save()
             return redirect('/success')
 
