@@ -208,3 +208,14 @@ class Business(models.Model):
     class Meta:
         verbose_name = 'Бизнес Ланч'
         verbose_name_plural = 'Бизнес Ланч'
+
+
+class FeedBack(models.Model):
+    username = models.CharField(verbose_name='Username в Telegram', max_length=120)
+    food_title = models.CharField(verbose_name='Название продукта', max_length=500)
+    description = models.CharField(verbose_name='Отзыв на продукцию', max_length=1200)
+    stars = models.CharField(verbose_name='Кол-во звезд', max_length=1)
+
+    class Meta:
+        verbose_name = 'Отзывы'
+        verbose_name_plural = 'Отзывы'

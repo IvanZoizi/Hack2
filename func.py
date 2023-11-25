@@ -29,3 +29,21 @@ class Dbase:
         if not user:
             self.cur.execute("""INSERT INTO dbase_userstelegram(id_user_telegram) VALUES(?)""", (id,))
             self.con.commit()
+
+    async def get_food_type(self, type_):
+        return self.cur.execute("""SELECT * FROM dbase_food WHERE type_food = ?""", (type_,)).fetchall()
+
+    async def get_business(self):
+        return self.cur.execute("""SELECT * FROM dbase_business""").fetchall()
+
+    async def new_feedback(self, username, data):
+        food = self.cur.execute("""SELECT * FROM dbase_food WHERE id_food = ?""", (data['ref'],)).fetchone()
+        self.cur.execute("""INSERT INTO dbase_feedback(username, food_title, stars, description) VALUES(?, ?, ?, ?) """,
+                         (username, food[1], data['stars'], data['des']))
+        self.con.commit()
+
+    async def new_feedback_business(self, username, data):
+        food = self.cur.execute("""SELECT * FROM dbase_business WHERE id = ?""", (data['ref'],)).fetchone()
+        self.cur.execute("""INSERT INTO dbase_feedback(username, food_title, stars, description) VALUES(?, ?, ?, ?) """,
+                         (username, food[1], data['stars'], data['des']))
+        self.con.commit()

@@ -23,6 +23,20 @@ class Reg(StatesGroup):
     description = State()
 
 
+class Menu(StatesGroup):
+    get_menu = State()
+    start = State()
+    feedback_des = State()
+    stars = State()
+
+
+class Business(StatesGroup):
+    get_menu = State()
+    start = State()
+    feedback_des = State()
+    stars = State()
+
+
 @dp.message_handler(commands=["start"])
 async def handler(message: types.Message):
     await asyncio.create_task(db.new_user(message.from_user.id))
@@ -40,8 +54,11 @@ async def handler(message: types.Message):
         elif message.from_user.id in ids_c:
             await message.answer("Здравствуйте, Ваша заявка находится на модерации")
         else:
+            keyboards = types.ReplyKeyboardMarkup()
+            keyboards.add(types.KeyboardButton(text='Узнать меню'))
+            keyboards.add(types.KeyboardButton(text='Узнать бизнес Ланчи'))
             await message.answer("Здравствуйте, тут Вы сможете узнать последние новости, "
-                                 "зарегистрироваться на мероприятия от кухни")
+                                 "зарегистрироваться на мероприятия от кухни", reply_markup=keyboards)
 
 
 @dp.message_handler(state=Reg.name)
@@ -81,6 +98,180 @@ async def reg_description_state(message: types.Message, state: FSMContext):
     await state.finish()
 
 
+async def get_menu_start(message: types.Message, state: FSMContext):
+    keyboard = types.ReplyKeyboardMarkup()
+    for i in ['Первое блюдо', 'Второе блюдо', 'Салат', 'Десерт', 'Напиток']:
+        keyboard.add(types.KeyboardButton(i))
+    await message.answer('Какой вид блюда Вы бы хотели увидеть?', reply_markup=keyboard)
+    await Menu.get_menu.set()
+
+
+@dp.message_handler(state=Menu.get_menu)
+async def get_menu_start_(message: types.Message, state: FSMContext):
+    if message.text not in ['Первое блюдо', 'Второе блюдо', 'Салат', 'Десерт', 'Напиток']:
+        await message.answer("Попробуйте еще раз")
+        return
+    food = await asyncio.create_task(db.get_food_type(message.text))
+    start_num = 0
+    keyboard = types.ReplyKeyboardMarkup()
+    if len(food) - start_num != 1:
+        for i in ['Далее', 'Оставить отзыв', 'Назад']:
+            keyboard.add(types.KeyboardButton(i))
+    else:
+        keyboard.add(types.KeyboardButton('Оставить отзыв'))
+        keyboard.add(types.KeyboardButton('Назад'))  # https://t.me/botusername?feedback=242915
+    photo = InputFile('./src/media/' + food[start_num][9])
+    await state.update_data(ref=food[start_num][0], start_num=start_num + 1, get=message.text)
+    await bot.send_photo(chat_id=message.from_user.id, photo=photo, caption=f"<code>{food[start_num][1]}</code>\n"
+                                                                            f"Цена - {food[start_num][2]}\n"
+                                                                            f"Состав блюда - {food[start_num][3]}\n", reply_markup=keyboard, parse_mode='html')
+    await Menu.start.set()
+
+
+@dp.message_handler(state=Menu.start)
+async def start_menu(message: types.Message, state: FSMContext):
+    if message.text == 'Назад':
+        await state.finish()
+        keyboards = types.ReplyKeyboardMarkup()
+        keyboards.add(types.KeyboardButton(text='Узнать меню'))
+        keyboards.add(types.KeyboardButton(text='Оставить отзыв на продукцию'))
+        await message.answer("Вы вернулись в главное меню", reply_markup=keyboards)
+        return
+    if message.text == 'Оставить отзыв':
+        return await asyncio.create_task(feedback(message, state))
+    data = await state.get_data()
+    food = await asyncio.create_task(db.get_food_type(data['get']))
+    start_num = data['start_num']
+    keyboard = types.ReplyKeyboardMarkup()
+    if len(food) - start_num != 1:
+        for i in ['Далее', 'Оставить отзыв', 'Назад']:
+            keyboard.add(types.KeyboardButton(i))
+    else:
+        keyboard.add(types.KeyboardButton('Оставить отзыв'))
+        keyboard.add(types.KeyboardButton('Назад'))
+    photo = InputFile('./src/media/' + food[start_num][9])
+    await state.update_data(ref=food[start_num][0], start_num=start_num + 1)
+    await bot.send_photo(chat_id=message.from_user.id, photo=photo, caption=f"<code>{food[start_num][1]}</code>\n"
+                                                                            f"Цена - {food[start_num][2]}\n"
+                                                                            f"Состав блюда - {food[start_num][3]}\n", reply_markup=keyboard, parse_mode='html')
+
+
+@dp.message_handler(commands='feedback', state=Menu.start)
+async def feedback(message: types.Message, state: FSMContext):
+    await message.answer("Расскажите что вы думаете о нашем товаре")
+    await Menu.feedback_des.set()
+
+
+@dp.message_handler(state=Menu.feedback_des)
+async def feedback_des(message: types.Message, state: FSMContext):
+
+    await state.update_data(des=message.text)
+    keyboard = types.ReplyKeyboardMarkup(row_width=5, resize_keyboard=True)
+    for i in ['1/2/3/4/5'.split('/')]:
+        keyboard.add(types.KeyboardButton(text=i[0].capitalize()), types.KeyboardButton(text=i[1].capitalize()), types.KeyboardButton(text=i[2].capitalize()), types.KeyboardButton(text=i[3].capitalize()), types.KeyboardButton(text=i[4].capitalize()))
+    await message.answer("Поставьте оценку нашей продукции", reply_markup=keyboard)
+    await Menu.stars.set()
+
+
+@dp.message_handler(state=Menu.stars)
+async def stars(message: types.Message, state: FSMContext):
+    if message.text not in ['1', '2', '3', '4', '5']:
+        return await message.answer("Попробуйте еще раз")
+    await state.update_data(stars=message.text)
+    data = await state.get_data()
+    await state.finish()
+    await asyncio.create_task(db.new_feedback(message.from_user.username, data))
+    keyboards = types.ReplyKeyboardMarkup()
+    keyboards.add(types.KeyboardButton(text='Узнать меню'))
+    keyboards.add(types.KeyboardButton(text='Оставить отзыв на продукцию'))
+    await message.answer("Спасибо за ваше мнение!", reply_markup=keyboards)
+
+
+async def get_bisness_start_(message: types.Message, state: FSMContext):
+    food = await asyncio.create_task(db.get_business())
+    start_num = 0
+    keyboard = types.ReplyKeyboardMarkup()
+    if len(food) - start_num != 1:
+        for i in ['Далее', 'Оставить отзыв', 'Назад']:
+            keyboard.add(types.KeyboardButton(i))
+    else:
+        keyboard.add(types.KeyboardButton('Оставить отзыв'))
+        keyboard.add(types.KeyboardButton('Назад'))  # https://t.me/botusername?feedback=242915
+    photo = InputFile('./src/media/' + food[start_num][9])
+    await state.update_data(ref=food[start_num][0], start_num=start_num + 1)
+    await bot.send_photo(chat_id=message.from_user.id, photo=photo, caption=f"<code>{food[start_num][1]}</code>\n"
+                                                                            f"Цена - {food[start_num][2]}\n"
+                                                                            f"Состав блюда - {food[start_num][8]}\n", reply_markup=keyboard, parse_mode='html')
+    await Business.start.set()
+
+
+@dp.message_handler(state=Business.start)
+async def start_bisness(message: types.Message, state: FSMContext):
+    if message.text == 'Назад':
+        await state.finish()
+        keyboards = types.ReplyKeyboardMarkup()
+        keyboards.add(types.KeyboardButton(text='Узнать меню'))
+        keyboards.add(types.KeyboardButton(text='Узнать бизнес Ланчи'))
+        await message.answer("Вы вернулись в главное меню", reply_markup=keyboards)
+        return
+    if message.text == 'Оставить отзыв':
+        return await asyncio.create_task(feedback_bisness(message, state))
+    data = await state.get_data()
+    food = await asyncio.create_task(db.get_business())
+    start_num = data['start_num']
+    keyboard = types.ReplyKeyboardMarkup()
+    if len(food) - start_num != 1:
+        for i in ['Далее', 'Оставить отзыв', 'Назад']:
+            keyboard.add(types.KeyboardButton(i))
+    else:
+        keyboard.add(types.KeyboardButton('Оставить отзыв'))
+        keyboard.add(types.KeyboardButton('Назад'))
+    photo = InputFile('./src/media/' + food[start_num][9])
+    await state.update_data(ref=food[start_num][0], start_num=start_num + 1)
+    await bot.send_photo(chat_id=message.from_user.id, photo=photo, caption=f"<code>{food[start_num][1]}</code>\n"
+                                                                            f"Цена - {food[start_num][2]}\n"
+                                                                            f"Состав блюда - {food[start_num][8]}\n", reply_markup=keyboard, parse_mode='html')
+
+
+@dp.message_handler(commands='feedback', state=Business.start)
+async def feedback_bisness(message: types.Message, state: FSMContext):
+    await message.answer("Расскажите что вы думаете о нашем товаре")
+    await Business.feedback_des.set()
+
+
+@dp.message_handler(state=Business.feedback_des)
+async def feedback_de_bisness(message: types.Message, state: FSMContext):
+
+    await state.update_data(des=message.text)
+    keyboard = types.ReplyKeyboardMarkup(row_width=5, resize_keyboard=True)
+    for i in ['1/2/3/4/5'.split('/')]:
+        keyboard.add(types.KeyboardButton(text=i[0].capitalize()), types.KeyboardButton(text=i[1].capitalize()), types.KeyboardButton(text=i[2].capitalize()), types.KeyboardButton(text=i[3].capitalize()), types.KeyboardButton(text=i[4].capitalize()))
+    await message.answer("Поставьте оценку нашей продукции", reply_markup=keyboard)
+    await Business.stars.set()
+
+
+@dp.message_handler(state=Business.stars)
+async def stars_bisness(message: types.Message, state: FSMContext):
+    if message.text not in ['1', '2', '3', '4', '5']:
+        return await message.answer("Попробуйте еще раз")
+    await state.update_data(stars=message.text)
+    data = await state.get_data()
+    await state.finish()
+    await asyncio.create_task(db.new_feedback_business(message.from_user.username, data))
+    keyboards = types.ReplyKeyboardMarkup()
+    keyboards.add(types.KeyboardButton(text='Узнать меню'))
+    keyboards.add(types.KeyboardButton(text='Узнать бизнес Ланчи'))
+    await message.answer("Спасибо за ваше мнение!", reply_markup=keyboards)
+
+
+@dp.message_handler()
+async def get_text(message: types.Message, state: FSMContext):
+    if message.text == 'Узнать меню':
+        await asyncio.create_task(get_menu_start(message, state))
+    elif message.text == 'Узнать бизнес Ланчи':
+        await asyncio.create_task(get_bisness_start_(message, state))
+
+
 async def new_courier():
     all_courier = await asyncio.create_task(db.get_expectation_all())
     for elem in all_courier:
@@ -92,7 +283,7 @@ async def new_courier():
 
 async def scheduler():
     try:
-        aioschedule.every().seconds.do(new_courier)
+        aioschedule.every().minute.do(new_courier)
         while True:
             await aioschedule.run_pending()
             await asyncio.sleep(1)

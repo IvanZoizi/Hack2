@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import User, Food, Expectation_Courier, Courier, Statistics, NewOrders, DeliveryOrders, Business
+from .models import User, Food, Expectation_Courier, Courier, Statistics, NewOrders, DeliveryOrders, Business, FeedBack
 from django import forms
 from django.contrib.auth.models import Group
 from django.contrib.admin.models import LogEntry
@@ -83,6 +83,12 @@ class BusinessAdmin(admin.ModelAdmin):
     list_display = ('title', 'price', 'count')
     fields = ['title', 'photo', 'price', 'count', 'first_dish', 'second_dish', 'third_dish', 'fours_dish', 'fives_dish',
               'structure']
+
+
+@admin.register(FeedBack)
+class Expectation_CourierAdmin(admin.ModelAdmin):
+    list_display = ("username", "food_title", 'description', 'stars')
+    readonly_fields = ("username", "food_title", 'description', 'stars')
 
 
 admin.site.unregister(Group)
