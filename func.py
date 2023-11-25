@@ -47,3 +47,21 @@ class Dbase:
         self.cur.execute("""INSERT INTO dbase_feedback(username, food_title, stars, description) VALUES(?, ?, ?, ?) """,
                          (username, food[1], data['stars'], data['des']))
         self.con.commit()
+
+    async def get_order(self):
+        return self.cur.execute("""SELECT * FROM dbase_neworders WHERE delivery = ?""", ('Да',)).fetchone()
+
+    async def get_order_id(self):
+        return self.cur.execute("""SELECT * FROM dbase_neworders WHERE delivery = ?""", ('Да',)).fetchall()
+
+    async def new_delivery(self, id_order, username_order, phone):
+        self.cur.execute("""INSERT INTO dbase_deliveryorders(id_order, courier_username, courier_phone) VALUES (?, ?, ?)""",
+                         (id_order, username_order, phone))
+        self.con.commit()
+
+    async def send(self, id_courier, id_order):
+        self.cur.execute("""INSERT INTO dbase_send(id_order, id_courier) VALUES(?, ?)""", (id_order, id_courier))
+        self.con.commit()
+
+    async def get_send(self, id_courier, id_order):
+        return self.cur.execute("""SELECT * FROM dbase_send WHERE id_order = ? AND id_courier = ?""", (id_order, id_courier)).fetchone()

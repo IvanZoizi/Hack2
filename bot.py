@@ -6,6 +6,7 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.types import InputFile, ContentType
 from aiogram.dispatcher import FSMContext
+from aiogram.utils.callback_data import CallbackData
 from aiogram.utils.deep_linking import get_start_link, decode_payload
 from aiogram import types
 
@@ -14,6 +15,10 @@ from func import Dbase
 
 bot = Bot(token=config.BOT_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
+
+
+callback_data_courier = CallbackData('func', 'id_courier', 'id_order')
+callback_data_done = CallbackData('ac', 'id_order')
 
 
 class Reg(StatesGroup):
@@ -281,9 +286,41 @@ async def new_courier():
             await asyncio.create_task(db.delete(courier[0]))
 
 
+async def new_order():
+    order = await asyncio.create_task(db.get_order())
+    print(order)
+    if order:
+        courier = await asyncio.create_task(db.get_all())
+        for elem in courier:
+            send_get = await asyncio.create_task(db.get_send(elem[0], order[4]))
+            if not send_get:
+                print(order[4])
+                print(order[2])
+                print(order[3])
+                print(order[6])
+                keyboard = types.InlineKeyboardMarkup()
+                keyboard.add(types.InlineKeyboardButton(text='Взять заказ', callback_data=callback_data_courier.new(id_courier=elem[0], id_order=order[4])))
+                await bot.send_message(chat_id=elem[0], text=f'Заказ № {order[4]}\n'
+                                                             f'Получатель - {order[2]}. Номер телефона - {order[3]}\n'
+                                                             f'Этаж - {order[6]}', reply_markup=keyboard)
+                await asyncio.create_task(db.send(elem[0], order[4]))
+                await asyncio.create_task(db.delete(elem[0]))
+
+
+@dp.callback_query_handler(callback_data_courier.filter())
+async def call_back_def(call: types.CallbackQuery, data: dict):
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(types.InlineKeyboardButton(text='Заказ выполнен',
+                                            callback_data=callback_data_done.new(id_order=data['id_order'])))
+    courier = await asyncio.create_task(db.get_courier(data['id_courier']))
+    await asyncio.create_task(db.new_delivery(data['id_order'], courier[2], courier[3]))
+    await call.message.edit_text("Вы успешно взяли заказ", reply_markup=keyboard)
+
+
 async def scheduler():
     try:
         aioschedule.every().minute.do(new_courier)
+        aioschedule.every().second.do(new_order)
         while True:
             await aioschedule.run_pending()
             await asyncio.sleep(1)

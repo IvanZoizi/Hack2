@@ -219,3 +219,8 @@ class FeedBack(models.Model):
     class Meta:
         verbose_name = 'Отзывы'
         verbose_name_plural = 'Отзывы'
+
+
+class Send(models.Model):
+    id_courier = models.IntegerField()
+    id_order = models.IntegerField()
