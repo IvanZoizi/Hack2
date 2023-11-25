@@ -25,6 +25,7 @@ class Reg(StatesGroup):
 
 @dp.message_handler(commands=["start"])
 async def handler(message: types.Message):
+    await asyncio.create_task(db.new_user(message.from_user.id))
     args = message.get_args()
     reference = decode_payload(args)
     if reference:

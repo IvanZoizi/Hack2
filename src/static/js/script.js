@@ -80,6 +80,11 @@ document.getElementById("deliveryman").onclick = function () {
     window.location.href = "../the_supplier/index.html";
   };
 
+document.getElementById("business").onclick = function () {
+    // Здесь вы можете указать ссылку на вторую HTML страницу
+    window.location.href = "/buy/business/";
+  };
+
 changeScreen()
 changeBg()
 

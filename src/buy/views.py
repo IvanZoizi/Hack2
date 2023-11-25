@@ -1,7 +1,7 @@
 import datetime
 
 from django.shortcuts import render, redirect
-from dbase.models import Food, Basket, Statistics, NewOrders
+from dbase.models import Food, Basket, Statistics, NewOrders, Business
 from .forms import Delivery
 
 
@@ -117,6 +117,7 @@ def confirm(request, pk):
     elif request.method == 'POST':
         form = Delivery(request.POST)
         if form.is_valid():
+            print(1231232)
             result = 0
             check_list = []
             data = form.cleaned_data
@@ -134,17 +135,62 @@ def confirm(request, pk):
                                                        date=datetime.datetime.now().strftime("%d.%m.%Y"))
                         static.count += 1
                         static.price += food.price
+                        static.remained = food.count
                     except Exception:
                         static = Statistics(food_name=food.title, day_of_the_week=datetime.datetime.now().strftime('%A'),
                                                        date=datetime.datetime.now().strftime("%d.%m.%Y"))
                         static.count = 1
                         static.price = food.price
+                        static.remained = food.count
                     static.save()
             new_order = NewOrders(user_name=user.name, user_phone=user.phone, price=result, foods=','.join(check_list),
-                                  delivery='Да' if data['check'] else 'Нет')
+                                  delivery='Да' if data['check'] else 'Нет', floor=data['floor'] if data['check'] else '')
             new_order.save()
             return redirect('/success')
 
 
-def success(requests):
-    return render(requests, 'buy/success.html')
+def success(request):
+    return render(request, 'buy/success.html')
+
+
+def business(request):
+    all_b = Business.object.all()
+    data = []
+    for i in all_b:
+        if i.count > 0:
+            data.append(i)
+    return render(request, 'buy/business.html', {"elems": data})
+
+
+def buy_business(request, pk):
+    if request.method == 'GET':
+        form = Delivery()
+        lanch = Business.object.get(id=pk)
+        return render(request, 'buy/confirm.html', {'price': lanch.price, 'check_list': lanch.title, 'form': form})
+    else:
+        user = request.user
+        form = Delivery(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+            food = Business.object.get(id=pk)
+            food.count -= 1
+            food.save()
+            try:
+                static = Statistics.object.get(food_name=food.title,
+                                               day_of_the_week=datetime.datetime.now().strftime('%A'),
+                                               date=datetime.datetime.now().strftime("%d.%m.%Y"))
+                static.count += 1
+                static.price += food.price
+                static.remained = food.count
+            except Exception:
+                static = Statistics(food_name=food.title, day_of_the_week=datetime.datetime.now().strftime('%A'),
+                                    date=datetime.datetime.now().strftime("%d.%m.%Y"))
+                static.count = 1
+                static.price = food.price
+                static.remained = food.count
+            static.save()
+
+            new_order = NewOrders(user_name=user.name, user_phone=user.phone, price=food.price, foods=f'Бизнес ланч - {food.title}',
+                                  delivery='Да' if data['check'] else 'Нет', floor=data['floor'] if data['check'] else '')
+            new_order.save()
+            return redirect('/success')

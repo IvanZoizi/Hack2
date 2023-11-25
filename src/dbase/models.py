@@ -27,7 +27,6 @@ class UserAccountManager(UserManager):
         return user
 
 
-
 class Food(models.Model):
     id_food = models.IntegerField(primary_key=True)
     photo = models.ImageField(verbose_name='Фотография блюда', upload_to='post', null=True, blank=True)
@@ -98,6 +97,7 @@ class User(AbstractBaseUser):
 class Statistics(models.Model):
     food_name = models.CharField(verbose_name='Название блюда', max_length=120)
     count = models.IntegerField(verbose_name='Сколько порций было куплено')
+    remained = models.IntegerField(verbose_name='Сколько порций было не продано')
     price = models.IntegerField(verbose_name='Прибыль без учета себестоимости')
     day_of_the_week = models.CharField(verbose_name='День недели', max_length=120)
     date = models.CharField(verbose_name='Дата', max_length=120)
@@ -110,13 +110,13 @@ class Statistics(models.Model):
 
 
 class NewOrders(models.Model):
-    id_order = models.IntegerField(verbose_name='Номер заказа')
-    # id_food = models.IntegerField(verbose_name='Id блюда')
+    id_order = models.IntegerField(verbose_name='Номер заказа', primary_key=True)
     user_name = models.CharField(verbose_name='Имя пользователя', max_length=120)
     user_phone = models.CharField(verbose_name='Номер телефона пользователя', max_length=120)
     price = models.IntegerField(verbose_name='Цена заказа')
     foods = models.CharField(verbose_name='Название блюд', max_length=12000)
     delivery = models.CharField(verbose_name='Будет осущественна доставка?', max_length=120)
+    floor = models.CharField(verbose_name='Этаж для доставки', max_length=120)
 
     object = models.Manager()
 
@@ -179,3 +179,32 @@ class Basket(models.Model):
     id_food = models.CharField(max_length=123213)
 
     object = models.Manager()
+
+
+class UsersTelegram(models.Model):
+    id_user_telegram = models.IntegerField(verbose_name='ID Telegram')
+
+    object = models.Manager()
+
+    class Meta:
+        verbose_name = 'Пользователи телеграм'
+        verbose_name_plural = 'Пользователи телеграм'
+
+
+class Business(models.Model):
+    title = models.CharField(max_length=120, verbose_name='Название блюд')
+    photo = models.ImageField(verbose_name='Фотография бизнес ланча', upload_to='post', null=True, blank=True)
+    price = models.IntegerField(verbose_name='Цена за Бизнес Ланч')
+    count = models.IntegerField(verbose_name='Кол-во Бизнес Ланча')
+    first_dish = models.CharField(max_length=120, verbose_name='Название первого блюда', help_text='Если блюдо отсутсвует установите "-"')
+    second_dish = models.CharField(max_length=120, verbose_name='Название второго блюда', help_text='Если блюдо отсутсвует установите "-"')
+    third_dish = models.CharField(max_length=120, verbose_name='Салаты', help_text='Если блюдо отсутсвует установите "-"')
+    fours_dish = models.CharField(max_length=120, verbose_name='Десерт', help_text='Если блюдо отсутсвует установите "-"')
+    fives_dish = models.CharField(max_length=120, verbose_name='Напиток', help_text='Если блюдо отсутсвует установите "-"')
+    structure = models.CharField(max_length=1000, verbose_name='Описание бизнес ланча', help_text='Укажите описание бизнес ланча')
+
+    object = models.Manager()
+
+    class Meta:
+        verbose_name = 'Бизнес Ланч'
+        verbose_name_plural = 'Бизнес Ланч'

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    {% for elem in elems %}
+            <img src="{{ elem.photo.url }}">
+            <p>{{elem.title}}</p>
+            <p>Цена - {{elem.price}}</p>
+            <p>Осталось порций - {{elem.count}}</p>
+            <p>О Бизнес Ланче - {{elem.structure}}</p>
+            {% if elem.first_dish != '-' %}
+                <p>Первое блюдо - {{elem.first_dish}}</p>
+            {% endif %}
+                {% if elem.second_dish != '-' %}
+                <p>Второе блюдо - {{elem.second_dish}}</p>
+            {% endif %}
+                {% if elem.third_dish != '-' %}
+                <p>Салат - {{elem.third_dish}}</p>
+            {% endif %}
+                {% if elem.fours_dish != '-' %}
+                <p>Десерт - {{elem.fours_dish}}</p>
+            {% endif %}
+                {% if elem.fives_dish != '-' %}
+                <p>Напиток - {{elem.fives_dish}}</p>
+            {% endif %}
+            <a href="/buy/business/{{elem.id}}">Выбрать</a>
+    {% endfor %}
+        <br>
+    <a href="/">Вернуться назад</a>
+</body>
+</html>

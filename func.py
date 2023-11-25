@@ -23,3 +23,9 @@ class Dbase:
     async def delete(self, id):
         self.cur.execute("""DELETE FROM dbase_expectation_courier WHERE id_user = ?""", (id,))
         self.con.commit()
+
+    async def new_user(self, id):
+        user = self.cur.execute("""SELECT * FROM dbase_userstelegram WHERE id_user_telegram = ?""", (id,)).fetchone()
+        if not user:
+            self.cur.execute("""INSERT INTO dbase_userstelegram(id_user_telegram) VALUES(?)""", (id,))
+            self.con.commit()
